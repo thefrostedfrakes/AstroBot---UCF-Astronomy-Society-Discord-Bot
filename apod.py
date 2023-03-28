@@ -3,6 +3,8 @@ import json
 import discord
 import asyncio
 import datetime
+import os
+import time
 
 def apodLoad(API_KEY):
     # API URL to access image
@@ -39,13 +41,22 @@ def apodLoad(API_KEY):
 
 
     # Download image
-    img_data = requests.get(image_url).content
-    with open('apod.jpg', 'wb') as handler:
-        handler.write(img_data)
+    imgFlag = False
+    try:
+        img_data = requests.get(image_url).content
+        with open('apod.jpg', 'wb') as handler:
+            handler.write(img_data)
+        imgFlag = True
+
+    except requests.exceptions.MissingSchema:
+        print("No image detected. Sending URL of link instead.")
 
     # Write title, explanation, and copyright if it exists (x == True) to apod.txt file
     with open('apod.txt', mode='a', encoding='utf-8') as f:
         f.truncate(0)
+        if (not imgFlag):
+            f.write('https://' + image_url[2:] + '\n')
+
         f.write('Title: "' + title + '"\n\n')
 
         if (x):
@@ -62,9 +73,16 @@ async def apodSend(client, config):
     apodRole = discord.utils.get(guild.roles, name='apod')
     apodChannel = client.get_channel(config["APOD CHANNEL ID"])
 
-    await apodChannel.send(f"<@&{apodRole.id}> Astronomy Picture of the Day for {today}:", file=discord.File("./apod.jpg"))
+    mod_time = os.path.getmtime('./apod.jpg')
+    readable_time = time.ctime(mod_time)
+    stripped_time = time.strptime(readable_time)
+    formatted_time = time.strftime("%m/%d/%y", stripped_time)
+
+    if formatted_time == datetime.datetime.now().strftime("%m/%d/%y"):
+        await apodChannel.send(f"<@&{apodRole.id}> Astronomy Picture of the Day for {today}:", file=discord.File("./apod.jpg"))
+    else:
+        await apodChannel.send(f"<@&{apodRole.id}> Astronomy Picture of the Day for {today}:")
 
     with open('apod.txt', mode='r', encoding='utf-8') as f:
         data = f.read()
         await apodChannel.send(data)
-
