@@ -9,7 +9,6 @@ import time
 def apodLoad(API_KEY):
     # API URL to access image
     url = 'https://api.nasa.gov/planetary/apod'
-    KEY_url = 'https://api.nasa.gov/planetary/apod?api_key=P2uKHMPtRKAw5aagztya0EdzBsmaYU66IfjMpuyY'
 
     # Parameters
     params = {
