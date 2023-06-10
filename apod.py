@@ -93,11 +93,11 @@ def apodScrape():
     image_url = url + apod_src
 
     # Extract title and explanation by finding <b> tag labeled " Explanation: "
-    title = soup.findAll('title')[0].get_text().replace('\n', '')
+    title = soup.findAll('title')[0].get_text().replace('\n', '').encode('utf-8', errors='ignore').decode()
     def findExlTag(tag):
         return tag.name == 'p' and tag.b and tag.b.string == ' Explanation: '
     
-    explanation = soup.find(findExlTag).get_text().replace('\n', ' ')
+    explanation = soup.find(findExlTag).get_text().replace('\n', ' ').encode('utf-8', errors='ignore').decode()
 
     # Write image to local system
     img_data = requests.get(image_url).content
