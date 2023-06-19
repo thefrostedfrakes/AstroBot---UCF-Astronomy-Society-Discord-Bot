@@ -32,9 +32,8 @@ def apodLoad(API_KEY):
     except UnicodeEncodeError:
         print("UnicodeEncodeError detected... not printing JSON data")
 
-    # Load HD image url from json data and extract title and explanation into a string
+    # Load title and explanation into a string
     # Note that strings are encoded in utf-8 and not ASCII to display special characters
-    image_url = json_data['url']
     title = json_data['title'].encode('utf-8', errors='ignore').decode()
     explanation = json_data['explanation'].encode('utf-8', errors='ignore').decode()
 
@@ -47,32 +46,48 @@ def apodLoad(API_KEY):
     except KeyError:
         print("No author or copyright holder found. Not adding to apod.txt.")
 
-
     # Download image
-    imgFlag = False
-    try:
+    if json_data['media_type'] == 'image':
+        try:
+            image_url = json_data['hdurl']
+        except KeyError:
+            image_url = json_data['url']
+
         img_data = requests.get(image_url).content
         with open('apod.jpg', 'wb') as handler:
             handler.write(img_data)
-        imgFlag = True
 
-    except requests.exceptions.MissingSchema:
-        print("No image detected. Sending URL of link instead.")
+        # Write title, explanation, and copyright if it exists to apod.txt file
+        with open('apod.txt', mode='a', encoding='utf-8') as f:
+            f.truncate(0)
 
-    # Write title, explanation, and copyright if it exists to apod.txt file
-    with open('apod.txt', mode='a', encoding='utf-8') as f:
-        f.truncate(0)
-        if (not imgFlag):
-            f.write('https://' + image_url[2:] + '\n')
+            f.write('Title: "' + title + '"\n\n')
 
-        f.write('Title: "' + title + '"\n\n')
+            if (copyrightFlag):
+                f.write('Copyright: ' + copyright + '\n\n')
 
-        if (copyrightFlag):
-            f.write('Copyright: ' + copyright + '\n\n')
+            f.write(explanation)
+            f.close()
 
-        f.write(explanation)
-        f.close()
+        return True
 
+    # If media type is video link, paste url to apod.txt and send instead
+    else:
+        video_url = json_data['url']
+
+        with open('apod.txt', mode='a', encoding='utf-8') as f:
+            f.truncate(0)
+
+            f.write(video_url + '\n\n')
+            f.write('Title: "' + title + '"\n\n')
+
+            if (copyrightFlag):
+                f.write('Copyright: ' + copyright + '\n\n')
+
+            f.write(explanation)
+            f.close()
+
+            return False
 
 # Web scraper using BeautifulSoup to extract apod image from main website if API server
 # is down.
@@ -111,7 +126,7 @@ def apodScrape():
         f.write(explanation)
 
 # Send apod.jpg and apod.txt to UCF Astronomy Society Discord server.
-async def apodSend(client, config):
+async def apodSend(client, config, isImg):
     date = datetime.datetime.now()
     today = date.strftime("%A, %B %d, %Y")
 
@@ -120,14 +135,8 @@ async def apodSend(client, config):
     apodRole = discord.utils.get(guild.roles, name='apod')
     apodChannel = client.get_channel(config["APOD CHANNEL ID"])
 
-    # Load time metadata from apod.jpg and reformat
-    mod_time = os.path.getmtime('./apod.jpg')
-    readable_time = time.ctime(mod_time)
-    stripped_time = time.strptime(readable_time)
-    formatted_time = time.strftime("%m/%d/%y", stripped_time)
-
     # Send date, apod.jpg, and apod.txt
-    if formatted_time == datetime.datetime.now().strftime("%m/%d/%y"):
+    if isImg:
         await apodChannel.send(f"<@&{apodRole.id}> Astronomy Picture of the Day for {today}:", file=discord.File("./apod.jpg"))
     else:
         await apodChannel.send(f"<@&{apodRole.id}> Astronomy Picture of the Day for {today}:")

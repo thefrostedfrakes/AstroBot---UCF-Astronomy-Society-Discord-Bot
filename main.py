@@ -21,14 +21,19 @@ async def on_ready():
     print("AstroBot is online!")
     await client.wait_until_ready()
 
+    isImg = None
+
     while not client.is_closed():
         t = time.localtime()
         current_time = time.strftime("%H:%M:%S", t)
 
-        if current_time == "15:59:30":
-            apodLoad(config["NASA API KEY"])
-        if current_time == "16:00:00":
-            await apodSend(client, config)
+        if current_time == "11:58:00":
+            if isImg is None:
+                isImg = apodLoad(config["NASA API KEY"])
+        if current_time == "12:00:00":
+            if isImg is not None:
+                await apodSend(client, config, isImg)
+                isImg = None
 
         await asyncio.sleep(1)
 
@@ -57,13 +62,24 @@ async def on_message(message):
         if not message.author.guild_permissions.administrator:
             await message.reply('Sorry, you do not have permission to use this command!')
             return
+        
         apodLoad(config["NASA API KEY"])
 
-    elif message.content.startswith('-apod-send'):
+    elif message.content.startswith('-apod-send-img'):
         if not message.author.guild_permissions.administrator:
             await message.reply('Sorry, you do not have permission to use this command!')
             return
-        await apodSend(client, config)
+        
+        isImg = True
+        await apodSend(client, config, isImg)
+
+    elif message.content.startswith('-apod-send-vid'):
+        if not message.author.guild_permissions.administrator:
+            await message.reply('Sorry, you do not have permission to use this command!')
+            return
+        
+        isImg = False
+        await apodSend(client, config, isImg)
 
     elif message.content.startswith('-purge'):
         if not message.author.guild_permissions.administrator:
