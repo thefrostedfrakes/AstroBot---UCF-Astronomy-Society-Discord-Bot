@@ -8,7 +8,7 @@ import time
 from bs4 import BeautifulSoup
 
 # Downloads APOD to local system and also writes copyright holder and image explanation.
-def apodLoad(API_KEY):
+def apodLoad(API_KEY) -> bool:
     # API URL to access image
     url = 'https://api.nasa.gov/planetary/apod'
 
@@ -87,11 +87,11 @@ def apodLoad(API_KEY):
             f.write(explanation)
             f.close()
 
-            return False
+        return False
 
 # Web scraper using BeautifulSoup to extract apod image from main website if API server
 # is down.
-def apodScrape():
+def apodScrape() -> bool:
     url = 'https://apod.nasa.gov/apod/'
 
     # Load response from apod.nasa.gov url and parse using BeautifulSoup. Find image tags.
@@ -99,8 +99,9 @@ def apodScrape():
     soup = BeautifulSoup(response.content, 'html.parser')
     img_tags = soup.findAll('img')
 
+    # ~~TODO: ADD VIDEO SCRAPER~~
     if len(img_tags) == 0:
-        return
+        return False
     
     # Load first image tags as apod and append apod source to main url for final url
     apod = img_tags[0]
@@ -125,8 +126,10 @@ def apodScrape():
         f.write('Title: "' + title + '"\n\n')
         f.write(explanation)
 
+    return True
+
 # Send apod.jpg and apod.txt to UCF Astronomy Society Discord server.
-async def apodSend(client, config, isImg):
+async def apodSend(client, config, isImg) -> None:
     date = datetime.datetime.now()
     today = date.strftime("%A, %B %d, %Y")
 
