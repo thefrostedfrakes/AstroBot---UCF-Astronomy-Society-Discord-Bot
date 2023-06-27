@@ -38,10 +38,9 @@ def apodLoad(API_KEY) -> bool:
     explanation = json_data['explanation'].encode('utf-8', errors='ignore').decode()
 
     # Write copyright holder if it exists. If not, message is displayed to console.
-    copyrightFlag = False
+    copyright = None
     try:
         copyright = json_data['copyright'].encode('utf-8', errors='ignore').decode()
-        copyrightFlag = True
 
     except KeyError:
         print("No author or copyright holder found. Not adding to apod.txt.")
@@ -63,7 +62,7 @@ def apodLoad(API_KEY) -> bool:
 
             f.write('Title: "' + title + '"\n\n')
 
-            if (copyrightFlag):
+            if copyright is not None:
                 f.write('Copyright: ' + copyright + '\n\n')
 
             f.write(explanation)
@@ -81,7 +80,7 @@ def apodLoad(API_KEY) -> bool:
             f.write(video_url + '\n\n')
             f.write('Title: "' + title + '"\n\n')
 
-            if (copyrightFlag):
+            if copyright is not None:
                 f.write('Copyright: ' + copyright + '\n\n')
 
             f.write(explanation)
@@ -114,6 +113,7 @@ def apodScrape() -> bool:
         return tag.name == 'p' and tag.b and tag.b.string == ' Explanation: '
     
     explanation = soup.find(findExlTag).get_text().replace('\n', ' ').encode('utf-8', errors='ignore').decode()
+    explanation = explanation.split("Tomorrow's picture:", 1)[0].encode('utf-8', errors='ignore').decode()
 
     # Write image to local system
     img_data = requests.get(image_url).content
@@ -147,3 +147,4 @@ async def apodSend(client, config, isImg) -> None:
     with open('apod.txt', mode='r', encoding='utf-8') as f:
         data = f.read()
         await apodChannel.send(data)
+        
