@@ -8,6 +8,16 @@ from bs4 import BeautifulSoup
 import re
 import discord
 
+# Converts latitude and longitude strings to floats, extracts direction from
+# coordinate, then returns the abs. value of lat and lon, plus directions
+def convert_coordinates(lat, lon):
+    lat = float(lat)
+    lon = float(lon)
+    lat_dir = 'N' if lat >= 0 else 'S'
+    lon_dir = 'E' if lon >= 0 else 'W'
+
+    return abs(lat), abs(lon), lat_dir, lon_dir
+
 # Uses open-notify API and Heavens Above to request ISS latitude, longitude,
 # and orbital data, then write to iss.txt and iss.csv
 def get_iss():
@@ -23,8 +33,9 @@ def get_iss():
     column_name = ["Latitude", "Longitude"]
     csv_data = [latitude, longitude]
 
-    print("Latitude: " + latitude)
-    print("Longitude: " + longitude)
+    latitude, longitude, lat_dir, lon_dir = convert_coordinates(latitude, longitude)
+    print(f"Latitude: {latitude}")
+    print(f"Longitude: {longitude}")
 
     # Parse text and find parameter lines
     soup = BeautifulSoup(orbital_response.text, 'html.parser')
@@ -41,8 +52,8 @@ def get_iss():
     with open('iss.txt', mode='a', encoding='utf-8') as f:
         f.truncate(0)
         f.write("Current ISS Coordinates:\n\n")
-        f.write("Latitude: " + latitude + "\n")
-        f.write("Longitude: " + longitude + "\n\n")
+        f.write(f"Latitude: {latitude}° {lat_dir}\n")
+        f.write(f"Longitude: {longitude}° {lon_dir}\n\n")
 
         for keys, value in orbital_parameters.items():
             f.write(keys + ": " + value + "\n")
