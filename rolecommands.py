@@ -1,5 +1,6 @@
 import discord
 from discord.utils import get
+from discord.ext import commands
 import json
 
 with open('config.json', 'r') as f:
@@ -7,7 +8,7 @@ with open('config.json', 'r') as f:
 
 channel_id = config["ROLE CHANNEL ID"]
 
-async def roles(message, client):
+async def roles(message: discord.Message) -> None:
 
     if message.channel.id != channel_id:
         return
@@ -27,9 +28,9 @@ async def roles(message, client):
         color = discord.Color.red()
     )
 
-    message_embed = await message.channel.send(embed=embed)
+    await message.channel.send(embed=embed)
 
-async def addrole(message, str, client):
+async def addrole(message: discord.Message, str: str, client: commands.Bot) -> None:
     channel = client.get_channel(channel_id)
 
     undergrad = get(message.guild.roles, name='Undergrad')
@@ -68,7 +69,7 @@ async def addrole(message, str, client):
     print('%s successfully added role %s' % (message.author, str))
     await message.reply('Role successfully added!')
 
-async def removerole(message, str, client):
+async def removerole(message: discord.Message, str: str, client: commands.Bot) -> None:
     channel = client.get_channel(channel_id)
 
     undergrad = get(message.guild.roles, name='Undergrad')
@@ -106,3 +107,4 @@ async def removerole(message, str, client):
     
     print('%s successfully removed role %s' % (message.author, str))
     await message.reply('Role successfully removed!')
+    

@@ -1,14 +1,12 @@
 import requests
 import json
 import discord
-import asyncio
+from discord.ext import commands
 import datetime
-import os
-import time
 from bs4 import BeautifulSoup
 
 # Downloads APOD to local system and also writes copyright holder and image explanation.
-def apodLoad(API_KEY) -> bool:
+def apodLoad(API_KEY: str) -> bool:
     # API URL to access image
     url = 'https://api.nasa.gov/planetary/apod'
 
@@ -129,7 +127,7 @@ def apodScrape() -> bool:
     return True
 
 # Send apod.jpg and apod.txt to UCF Astronomy Society Discord server.
-async def apodSend(client, config, isImg) -> None:
+async def apodSend(client: commands.Bot, config: dict, isImg: bool) -> None:
     date = datetime.datetime.now()
     today = date.strftime("%A, %B %d, %Y")
 

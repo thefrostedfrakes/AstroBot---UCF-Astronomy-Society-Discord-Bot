@@ -1,5 +1,4 @@
 import discord
-import os
 import time
 import asyncio
 import json
@@ -38,7 +37,7 @@ async def on_ready():
         await asyncio.sleep(1)
 
 @client.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     print('User %s just sent this message in %s: %s' % (message.author, message.channel.name, message.content))
 
     if message.author == client.user:
@@ -48,7 +47,7 @@ async def on_message(message):
         await message.channel.send('pong!')
 
     elif message.content.startswith('-roles'):
-        await roles(message, client)
+        await roles(message)
 
     elif message.content.startswith('-addrole'):
         str = message.content[9:]
@@ -70,16 +69,14 @@ async def on_message(message):
             await message.reply('Sorry, you do not have permission to use this command!')
             return
         
-        isImg = True
-        await apodSend(client, config, isImg)
+        await apodSend(client, config, isImg=True)
 
     elif message.content.startswith('-apod-send-vid'):
         if not message.author.guild_permissions.administrator:
             await message.reply('Sorry, you do not have permission to use this command!')
             return
         
-        isImg = False
-        await apodSend(client, config, isImg)
+        await apodSend(client, config, isImg=False)
 
     elif message.content.startswith('-purge'):
         if not message.author.guild_permissions.administrator:
@@ -89,7 +86,7 @@ async def on_message(message):
         await purge(message, str)
 
     elif message.content.startswith('-iss'):
-        await iss(message, client, config["ISS CHANNEL ID"])
+        await iss(client, config["ISS CHANNEL ID"])
     
 
 client.run(config["TOKEN"])

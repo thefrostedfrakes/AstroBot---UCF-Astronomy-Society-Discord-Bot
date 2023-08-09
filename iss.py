@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
 import re
 import discord
+from discord.ext import commands
 
 # Converts latitude and longitude strings to floats, extracts direction from
 # coordinate, then returns the abs. value of lat and lon, plus directions
-def convert_coordinates(lat, lon):
+def convert_coordinates(lat: str, lon: str) -> (float, float, str, str):
     lat = float(lat)
     lon = float(lon)
     lat_dir = 'N' if lat >= 0 else 'S'
@@ -20,7 +21,7 @@ def convert_coordinates(lat, lon):
 
 # Uses open-notify API and Heavens Above to request ISS latitude, longitude,
 # and orbital data, then write to iss.txt and iss.csv
-def get_iss():
+def get_iss() -> None:
     # Get requests for lat & long response as well as orbital parameters
     latlon_response = requests.get('http://api.open-notify.org/iss-now.json')
     orbital_response = requests.get('https://www.heavens-above.com/orbit.aspx?satid=25544&lat=28.6144&lng=-81.1965&loc=Unnamed&alt=0&tz=EST')
@@ -67,7 +68,7 @@ def get_iss():
         writer.writerow(csv_data)
 
 # Creates matplotlib graph using geopandas that graphs coordinate data on world map
-def map():
+def map() -> None:
     df = pd.read_csv('iss.csv', usecols=["Latitude", "Longitude"])
 
     # Initialize map w/ geopandas
@@ -83,7 +84,7 @@ def map():
     plt.ylabel("Latitude")
     plt.savefig("iss.png")
 
-async def iss(message, client, channel_id):
+async def iss(client: commands.Bot, channel_id: int) -> None:
     issChannel = client.get_channel(channel_id)
     get_iss()
     map()
