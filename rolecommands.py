@@ -8,10 +8,10 @@ with open('config.json', 'r') as f:
 
 channel_id = config["ROLE CHANNEL ID"]
 
-async def roles(message: discord.Message) -> None:
-
-    if message.channel.id != channel_id:
-        return
+async def roles_command(interaction: discord.Interaction, client: discord.Client) -> None:
+    channel = client.get_channel(channel_id)
+    if interaction.channel_id != channel_id:
+        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!")
     
     embed = discord.Embed(
         title = "Select your role based on your current status in the club!",
@@ -28,83 +28,81 @@ async def roles(message: discord.Message) -> None:
         color = discord.Color.red()
     )
 
-    await message.channel.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
-async def addrole(message: discord.Message, str: str, client: commands.Bot) -> None:
+async def addrole_command(interaction: discord.Interaction, rolename: str, client: commands.Bot) -> None:
     channel = client.get_channel(channel_id)
+    if interaction.channel_id != channel_id:
+        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!")
 
-    undergrad = get(message.guild.roles, name='Undergrad')
-    grad = get(message.guild.roles, name='Grad Student')
-    kutsVolunteer = get(message.guild.roles, name='KUTS Volunteer')
-    alumni = get(message.guild.roles, name='Alumni')
-    colloquium = get(message.guild.roles, name='Colloquium')
-    projects = get(message.guild.roles, name='Projects')
-    trips = get(message.guild.roles, name='Trips')
-    apod_role = get(message.guild.roles, name='apod')
-
-    if message.channel != channel:
-        return
+    undergrad = get(interaction.guild.roles, name='Undergrad')
+    grad = get(interaction.guild.roles, name='Grad Student')
+    kutsVolunteer = get(interaction.guild.roles, name='KUTS Volunteer')
+    alumni = get(interaction.guild.roles, name='Alumni')
+    colloquium = get(interaction.guild.roles, name='Colloquium')
+    projects = get(interaction.guild.roles, name='Projects')
+    trips = get(interaction.guild.roles, name='Trips')
+    apod_role = get(interaction.guild.roles, name='apod')
     
-    if str == '':
-        return await message.reply('Please enter the role you wish to add! For a list of roles, use -roles')
-    if str == 'undergrad':
-        await message.author.add_roles(undergrad)
-    elif str == 'grad':
-        await message.author.add_roles(grad)
-    elif str == 'kuts-volunteer':
-        await message.author.add_roles(kutsVolunteer)
-    elif str == 'alumni':
-        await message.author.add_roles(alumni)
-    elif str == 'colloquium':
-        await message.author.add_roles(colloquium)
-    elif str == 'projects':
-        await message.author.add_roles(projects)
-    elif str == 'trips':
-        await message.author.add_roles(trips)
-    elif str == 'apod':
-        await message.author.add_roles(apod_role)
+    if rolename == '':
+        return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles')
+    if rolename == 'undergrad':
+        await interaction.user.add_roles(undergrad)
+    elif rolename == 'grad':
+        await interaction.user.add_roles(grad)
+    elif rolename == 'kuts-volunteer':
+        await interaction.user.add_roles(kutsVolunteer)
+    elif rolename == 'alumni':
+        await interaction.user.add_roles(alumni)
+    elif rolename == 'colloquium':
+        await interaction.user.add_roles(colloquium)
+    elif rolename == 'projects':
+        await interaction.user.add_roles(projects)
+    elif rolename == 'trips':
+        await interaction.user.add_roles(trips)
+    elif rolename == 'apod':
+        await interaction.user.add_roles(apod_role)
     else:
-        return await message.reply('That role does not exist! For a list of available roles, use -roles')
+        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles')
     
-    print('%s successfully added role %s' % (message.author, str))
-    await message.reply('Role successfully added!')
+    print(f"{interaction.user} successfully added role {rolename}")
+    await interaction.response.send_message('Role successfully added!')
 
-async def removerole(message: discord.Message, str: str, client: commands.Bot) -> None:
+async def removerole_command(interaction: discord.Interaction, rolename: str, client: commands.Bot) -> None:
     channel = client.get_channel(channel_id)
+    if interaction.channel_id != channel_id:
+        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!")
 
-    undergrad = get(message.guild.roles, name='Undergrad')
-    grad = get(message.guild.roles, name='Grad Student')
-    kutsVolunteer = get(message.guild.roles, name='KUTS Volunteer')
-    alumni = get(message.guild.roles, name='Alumni')
-    colloquium = get(message.guild.roles, name='Colloquium')
-    projects = get(message.guild.roles, name='Projects')
-    trips = get(message.guild.roles, name='Trips')
-    apod_role = get(message.guild.roles, name='apod')
-
-    if message.channel != channel:
-        return
+    undergrad = get(interaction.guild.roles, name='Undergrad')
+    grad = get(interaction.guild.roles, name='Grad Student')
+    kutsVolunteer = get(interaction.guild.roles, name='KUTS Volunteer')
+    alumni = get(interaction.guild.roles, name='Alumni')
+    colloquium = get(interaction.guild.roles, name='Colloquium')
+    projects = get(interaction.guild.roles, name='Projects')
+    trips = get(interaction.guild.roles, name='Trips')
+    apod_role = get(interaction.guild.roles, name='apod')
     
-    if str == '':
-        return await message.reply('Please enter the role you wish to add! For a list of roles, use -roles')
-    if str == 'undergrad':
-        await message.author.remove_roles(undergrad)
-    elif str == 'grad':
-        await message.author.remove_roles(grad)
-    elif str == 'kuts-volunteer':
-        await message.author.remove_roles(kutsVolunteer)
-    elif str == 'alumni':
-        await message.author.remove_roles(alumni)
-    elif str == 'colloquium':
-        await message.author.remove_roles(colloquium)
-    elif str == 'projects':
-        await message.author.remove_roles(projects)
-    elif str == 'trips':
-        await message.author.remove_roles(trips)
-    elif str == 'apod':
-        await message.author.remove_roles(apod_role)
+    if rolename == '':
+        return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles')
+    if rolename == 'undergrad':
+        await interaction.user.remove_roles(undergrad)
+    elif rolename == 'grad':
+        await interaction.user.remove_roles(grad)
+    elif rolename == 'kuts-volunteer':
+        await interaction.user.remove_roles(kutsVolunteer)
+    elif rolename == 'alumni':
+        await interaction.user.remove_roles(alumni)
+    elif rolename == 'colloquium':
+        await interaction.user.remove_roles(colloquium)
+    elif rolename == 'projects':
+        await interaction.user.remove_roles(projects)
+    elif rolename == 'trips':
+        await interaction.user.remove_roles(trips)
+    elif rolename == 'apod':
+        await interaction.user.remove_roles(apod_role)
     else:
-        return await message.reply('That role does not exist! For a list of available roles, use -roles')
+        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles')
     
-    print('%s successfully removed role %s' % (message.author, str))
-    await message.reply('Role successfully removed!')
+    print(f"{interaction.user} successfully removed role {rolename}")
+    await interaction.response.send_message('Role successfully removed!')
     

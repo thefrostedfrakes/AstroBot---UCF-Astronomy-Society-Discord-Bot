@@ -3,13 +3,13 @@ import time
 import asyncio
 import json
 from discord.ext import commands
-from rolecommands import roles, addrole, removerole
+from rolecommands import roles_command, addrole_command, removerole_command
 from apod import apodLoad, apodSend
 from purge import purge
-from iss import iss
+from iss import send_iss
 
 intents = discord.Intents.all()
-client = commands.Bot(intents=intents, command_prefix = '-')
+client = commands.Bot(intents=intents, command_prefix='!')
 client.remove_command('help')
 
 with open('config.json', 'r') as f:
@@ -19,6 +19,13 @@ with open('config.json', 'r') as f:
 async def on_ready():
     print("AstroBot is online!")
     await client.wait_until_ready()
+
+    try:
+        synced = await client.tree.sync()
+        print(f"Synced {len(synced)} commands")
+    
+    except Exception as e:
+        print(f"Error syncing commands: {e}")
 
     isImg = None
 
@@ -36,26 +43,32 @@ async def on_ready():
 
         await asyncio.sleep(1)
 
+@client.tree.command(name='ping', description="Ping the bot! (Just to test)")
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message(f"{interaction.user.mention} pong!")
+
+@client.tree.command(name='iss', description="Find out where the ISS is currently overhead!")
+async def iss(interaction: discord.Interaction):
+    await send_iss(interaction, client, config["ISS CHANNEL ID"])
+
+@client.tree.command(name='roles', description="View all available roles in the server.")
+async def roles(interaction: discord.Interaction):
+    await roles_command(interaction, client)
+
+@client.tree.command(name='addrole', description="Assign yourself a role.")
+async def roles(interaction: discord.Interaction, rolename: str):
+    await addrole_command(interaction, rolename, client)
+
+@client.tree.command(name='removerole', description="Remove a role from your account.")
+async def roles(interaction: discord.Interaction, rolename: str):
+    await removerole_command(interaction, rolename, client)
+
 @client.event
 async def on_message(message: discord.Message):
-    print('User %s just sent this message in %s: %s' % (message.author, message.channel.name, message.content))
+    print("User %s just sent this message in %s: %s" % (message.author, message.channel.name, message.content))
 
     if message.author == client.user:
         return
-    
-    if message.content.startswith('-ping'):
-        await message.channel.send('pong!')
-
-    elif message.content.startswith('-roles'):
-        await roles(message)
-
-    elif message.content.startswith('-addrole'):
-        str = message.content[9:]
-        await addrole(message, str, client)
-
-    elif message.content.startswith('-removerole'):
-        str = message.content[12:]
-        await removerole(message, str, client)
 
     elif message.content.startswith('-apod-load'):
         if not message.author.guild_permissions.administrator:
@@ -84,9 +97,6 @@ async def on_message(message: discord.Message):
             return
         str = message.content[7:]
         await purge(message, str)
-
-    elif message.content.startswith('-iss'):
-        await iss(client, config["ISS CHANNEL ID"])
     
 
 client.run(config["TOKEN"])
