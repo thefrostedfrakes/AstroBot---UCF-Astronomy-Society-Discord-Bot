@@ -45,7 +45,7 @@ async def on_ready():
 
 @client.tree.command(name='ping', description="Ping the bot! (Just to test)")
 async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message(f"{interaction.user.mention} pong!")
+    await interaction.response.send_message(f"{interaction.user.mention} pong!", ephemeral=True)
 
 @client.tree.command(name='iss', description="Find out where the ISS is currently overhead!")
 async def iss(interaction: discord.Interaction):
@@ -65,7 +65,10 @@ async def roles(interaction: discord.Interaction, rolename: str):
 
 @client.event
 async def on_message(message: discord.Message):
-    print("User %s just sent this message in %s: %s" % (message.author, message.channel.name, message.content))
+    try:
+        print(f"User {message.author} just sent this message in {message.channel.name}: {message.content}")
+    except AttributeError as e:
+        print(f"Error displaying message sent by {message.author}: {e}")
 
     if message.author == client.user:
         return

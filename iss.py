@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
 import re
 import discord
-import asyncio
 
 # Converts latitude and longitude strings to floats, extracts direction from
 # coordinate, then returns the abs. value of lat and lon, plus directions
@@ -87,7 +86,8 @@ def map() -> None:
 async def send_iss(interaction: discord.Interaction, client: discord.Client, channel_id: int) -> None:
     channel = client.get_channel(channel_id)
     if interaction.channel_id != channel_id:
-        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!")
+        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!",
+                                                       ephemeral=True)
     
     await interaction.response.defer()
     get_iss()
@@ -96,3 +96,4 @@ async def send_iss(interaction: discord.Interaction, client: discord.Client, cha
     with open('iss.txt', mode='r', encoding='utf-8') as f:
         data = f.read()
         await interaction.followup.send(data, file=discord.File("./iss.png"))
+        

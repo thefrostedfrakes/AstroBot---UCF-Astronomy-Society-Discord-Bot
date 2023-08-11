@@ -33,7 +33,8 @@ async def roles_command(interaction: discord.Interaction, client: discord.Client
 async def addrole_command(interaction: discord.Interaction, rolename: str, client: commands.Bot) -> None:
     channel = client.get_channel(channel_id)
     if interaction.channel_id != channel_id:
-        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!")
+        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!",
+                                                       ephemeral=True)
 
     undergrad = get(interaction.guild.roles, name='Undergrad')
     grad = get(interaction.guild.roles, name='Grad Student')
@@ -45,7 +46,8 @@ async def addrole_command(interaction: discord.Interaction, rolename: str, clien
     apod_role = get(interaction.guild.roles, name='apod')
     
     if rolename == '':
-        return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles')
+        return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles',
+                                                       ephemeral=True)
     if rolename == 'undergrad':
         await interaction.user.add_roles(undergrad)
     elif rolename == 'grad':
@@ -63,7 +65,8 @@ async def addrole_command(interaction: discord.Interaction, rolename: str, clien
     elif rolename == 'apod':
         await interaction.user.add_roles(apod_role)
     else:
-        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles')
+        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles',
+                                                       ephemeral=True)
     
     print(f"{interaction.user} successfully added role {rolename}")
     await interaction.response.send_message('Role successfully added!')
@@ -71,7 +74,8 @@ async def addrole_command(interaction: discord.Interaction, rolename: str, clien
 async def removerole_command(interaction: discord.Interaction, rolename: str, client: commands.Bot) -> None:
     channel = client.get_channel(channel_id)
     if interaction.channel_id != channel_id:
-        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!")
+        return await interaction.response.send_message(f"Please post in the {channel.mention} channel to use this command!",
+                                                       ephemeral=True)
 
     undergrad = get(interaction.guild.roles, name='Undergrad')
     grad = get(interaction.guild.roles, name='Grad Student')
@@ -83,7 +87,8 @@ async def removerole_command(interaction: discord.Interaction, rolename: str, cl
     apod_role = get(interaction.guild.roles, name='apod')
     
     if rolename == '':
-        return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles')
+        return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles',
+                                                       ephemeral=True)
     if rolename == 'undergrad':
         await interaction.user.remove_roles(undergrad)
     elif rolename == 'grad':
@@ -101,7 +106,8 @@ async def removerole_command(interaction: discord.Interaction, rolename: str, cl
     elif rolename == 'apod':
         await interaction.user.remove_roles(apod_role)
     else:
-        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles')
+        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles',
+                                                       ephemeral=True)
     
     print(f"{interaction.user} successfully removed role {rolename}")
     await interaction.response.send_message('Role successfully removed!')
