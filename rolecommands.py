@@ -48,25 +48,27 @@ async def addrole_command(interaction: discord.Interaction, rolename: str, clien
     if rolename == '':
         return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles',
                                                        ephemeral=True)
-    if rolename == 'undergrad':
-        await interaction.user.add_roles(undergrad)
-    elif rolename == 'grad':
-        await interaction.user.add_roles(grad)
-    elif rolename == 'kuts-volunteer':
-        await interaction.user.add_roles(kutsVolunteer)
-    elif rolename == 'alumni':
-        await interaction.user.add_roles(alumni)
-    elif rolename == 'colloquium':
-        await interaction.user.add_roles(colloquium)
-    elif rolename == 'projects':
-        await interaction.user.add_roles(projects)
-    elif rolename == 'trips':
-        await interaction.user.add_roles(trips)
-    elif rolename == 'apod':
-        await interaction.user.add_roles(apod_role)
-    else:
-        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles',
-                                                       ephemeral=True)
+
+    match rolename:
+        case 'undergrad':
+            await interaction.user.add_roles(undergrad)
+        case 'grad':
+            await interaction.user.add_roles(grad)
+        case 'kuts-volunteer':
+            await interaction.user.add_roles(kutsVolunteer)
+        case 'alumni':
+            await interaction.user.add_roles(alumni)
+        case 'colloquium':
+            await interaction.user.add_roles(colloquium)
+        case 'projects':
+            await interaction.user.add_roles(projects)
+        case 'trips':
+            await interaction.user.add_roles(trips)
+        case 'apod':
+            await interaction.user.add_roles(apod_role)
+        case _:
+            return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles',
+                                                            ephemeral=True)
     
     print(f"{interaction.user} successfully added role {rolename}")
     await interaction.response.send_message('Role successfully added!')
@@ -89,25 +91,26 @@ async def removerole_command(interaction: discord.Interaction, rolename: str, cl
     if rolename == '':
         return await interaction.response.send_message('Please enter the role you wish to add! For a list of roles, use -roles',
                                                        ephemeral=True)
-    if rolename == 'undergrad':
-        await interaction.user.remove_roles(undergrad)
-    elif rolename == 'grad':
-        await interaction.user.remove_roles(grad)
-    elif rolename == 'kuts-volunteer':
-        await interaction.user.remove_roles(kutsVolunteer)
-    elif rolename == 'alumni':
-        await interaction.user.remove_roles(alumni)
-    elif rolename == 'colloquium':
-        await interaction.user.remove_roles(colloquium)
-    elif rolename == 'projects':
-        await interaction.user.remove_roles(projects)
-    elif rolename == 'trips':
-        await interaction.user.remove_roles(trips)
-    elif rolename == 'apod':
-        await interaction.user.remove_roles(apod_role)
-    else:
-        return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles',
-                                                       ephemeral=True)
+    match rolename:
+        case 'undergrad':
+            await interaction.user.remove_roles(undergrad)
+        case 'grad':
+            await interaction.user.remove_roles(grad)
+        case 'kuts-volunteer':
+            await interaction.user.remove_roles(kutsVolunteer)
+        case 'alumni':
+            await interaction.user.remove_roles(alumni)
+        case 'colloquium':
+            await interaction.user.remove_roles(colloquium)
+        case 'projects':
+            await interaction.user.remove_roles(projects)
+        case 'trips':
+            await interaction.user.remove_roles(trips)
+        case 'apod':
+            await interaction.user.remove_roles(apod_role)
+        case _:
+            return await interaction.response.send_message('That role does not exist! For a list of available roles, use -roles',
+                                                            ephemeral=True)
     
     print(f"{interaction.user} successfully removed role {rolename}")
     await interaction.response.send_message('Role successfully removed!')
