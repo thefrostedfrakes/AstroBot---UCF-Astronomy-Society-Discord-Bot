@@ -73,6 +73,17 @@ async def on_message(message: discord.Message):
     if message.author == client.user:
         return
 
+    elif message.content.startswith('-roles'):
+        await roles_command(message, client)
+
+    elif message.content.startswith('-addrole'):
+        rolename = message.content[9:]
+        await addrole_command(message, rolename, client)
+
+    elif message.content.startswith('-removerole'):
+        rolename = message.content[12:]
+        await removerole_command(message, rolename, client)
+
     elif message.content.startswith('-apod-load'):
         if not message.author.guild_permissions.administrator:
             await message.reply('Sorry, you do not have permission to use this command!')
